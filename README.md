@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Council
 
-## Getting Started
+让多个 AI 模型组成专家委员会，围绕你的问题进行结构化辩论，最终给出经过多方审视的可靠结论。
 
-First, run the development server:
+## 工作流程
+
+1. **提出你的问题** - 任何需要深入思考的问题
+2. **AI 委员会展开辩论** - 3 位不同视角的 AI 专家 + 1 位主持人，进行多轮结构化讨论
+3. **获得共识结论** - 经过多方审视的可靠答案
+
+## 技术栈
+
+- **框架**: Next.js 16 (App Router)
+- **语言**: TypeScript
+- **数据库**: SQLite + Prisma 7
+- **认证**: NextAuth v5
+- **UI**: Tailwind CSS + shadcn/ui
+- **AI 集成**: Vercel AI SDK (OpenAI + Anthropic)
+
+## 快速开始
+
+### 1. 安装依赖
+
+```bash
+npm install
+```
+
+### 2. 配置环境变量
+
+复制 `.env.example` 或编辑 `.env.local`：
+
+```env
+AUTH_SECRET=your-auth-secret
+OPENAI_API_KEY=sk-your-openai-api-key
+ANTHROPIC_API_KEY=sk-ant-your-anthropic-api-key
+```
+
+生成 AUTH_SECRET：`openssl rand -base64 32`
+
+### 3. 初始化数据库
+
+```bash
+npx prisma migrate dev
+```
+
+### 4. 启动开发服务器
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+访问 http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 生产部署
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Docker
 
-## Learn More
+```bash
+docker compose up -d
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 手动部署
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 项目结构
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/          # 认证 API
+│   │   └── councils/      # Council CRUD + SSE
+│   ├── council/[id]/      # 实时辩论页面
+│   ├── history/           # 历史记录
+│   ├── login/             # 登录注册
+│   └── page.tsx           # 首页
+├── components/
+│   └── ui/                # shadcn/ui 组件
+├── lib/
+│   ├── council-engine.ts  # 辩论引擎核心
+│   ├── auth-utils.ts      # 认证工具
+│   ├── db.ts              # 数据库客户端
+│   └── utils.ts           # 通用工具
+└── generated/prisma/      # Prisma 客户端
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 默认 AI 委员会成员
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| 角色 | 模型 | 视角 |
+|------|------|------|
+| AI 主持人 | GPT-4o | 引导讨论、推动共识 |
+| 务实派专家 | GPT-4o | 工程可行性、最小方案 |
+| 创新派专家 | Claude Sonnet 4 | 前沿技术、突破思维 |
+| 安全派专家 | Claude Sonnet 4 | 安全可靠、长期维护 |
+
+## API 端点
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/auth/register` | POST | 用户注册 |
+| `/api/auth/[...nextauth]` | * | NextAuth 认证 |
+| `/api/councils` | GET/POST | 列表/创建 Council |
+| `/api/councils/[id]` | GET/DELETE | 查看/删除 Council |
+| `/api/councils/[id]/stream` | GET | SSE 实时流 |
+
+## V2 计划
+
+- [ ] 自定义 AI 参与者（选择模型、自定义视角）
+- [ ] 讨论回放（逐轮回放过去的辩论）
+- [ ] 分享功能（生成讨论链接）
+- [ ] 讨论导出（PDF/Markdown）
+- [ ] 更多的 AI 模型支持
+- [ ] 参数调节（温度、轮数等）
+- [ ] 多语言问题支持
+- [ ] 语音输入
